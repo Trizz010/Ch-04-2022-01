@@ -46,11 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private Button download;
     private PowerManager.WakeLock wakeLock;
 
+    private DownloadManager manager;
+    private long downloadID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         download = findViewById(R.id.downloadButton);
+
+
+        manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
         isPlugged = false;
         hasBattery = false;
@@ -84,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     conf.setPositiveButton("Yes",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    manager.remove(downloadID);
                                 }
                             });
                     conf.setPositiveButton("No, cancel the download",
@@ -113,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                                 conf.setPositiveButton("Yes",
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
+                                                manager.remove(downloadID);
                                             }
                                         });
                                 conf.setPositiveButton("No, cancel the download",
@@ -161,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "testfile.bin");
 
         //Once with the request prepared and configured, we obtain the proper system service and start the download
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+//        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        downloadID = manager.enqueue(request);
 
         // We register a Broadcast Receiver (explained below)
         registerReceiver(new DownloadCompleteReceiver(), new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
